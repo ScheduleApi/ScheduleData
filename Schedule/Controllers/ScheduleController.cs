@@ -52,13 +52,30 @@ namespace Schedule.Controllers
 
         [HttpPut]
         [Route("~/api/Schedule/UpdateSchedule")]
-        public IActionResult UpdateSchedule([FromBody] ScheduleModel data)
+        public IActionResult UpdateSchedule([FromBody] ScheduleModel model)
         {
             try
-            {   
-                ITransactionManager.UpdateSchedule(data);
-                var getData = ITransactionManager.GetAllSchedule().Where(m => m.Id == data.Id);
-                return Json(new { getData, Status = "OK" });
+            {
+                var data = ITransactionManager.GetAllSchedule().Where(m => m.Id == model.Id).FirstOrDefault();
+                data.Id = model.Id;
+                if (string.IsNullOrEmpty(model.Title) || string.IsNullOrEmpty(model.Description))
+                {
+                    data.Title = data.Title;
+                    data.Description = data.Description;
+                }
+
+                else
+                {
+                    data.Title = model.Title;
+                    data.Description = model.Description;
+                }
+                data.StartDate = model.StartDate;
+                data.EndDate = model.EndDate;
+                data.Description = model.Description;
+
+                var getCurrentData = ITransactionManager.UpdateSchedule(data);
+
+                return Json(new { getCurrentData, Status = "OK" });
             }
             catch (Exception ex)
             {
